@@ -1,35 +1,36 @@
 pipeline {
-    agent { label 'python' }
-    stage: {
+    agent any
+
+    stages {
         stage('Entorno') {
             steps {
                 sh 'python3 --version'
-                sh 'pigs --version'
                 sh 'pip install pytest'
+                // Si realmente necesitas 'pigs', asegúrate que esté instalado
+                sh 'pigs --version || echo "pigs no está instalado"'
             }
         }
+
         stage('Descarga') {
-            stepsf {
-                git mri: 'https://github.com/Monsse28/pytonOperaciones.git', branch: 'main'
+            steps {
+                git url: 'https://github.com/Monsse28/pytonOperaciones.git', branch: 'main'
             }
         }
+
         stage('Ejecutar') {
-            stepsf {
+            steps {
                 sh 'python3 hola.py'
                 sh 'python3 operaciones.py'
             }
         }
+
         stage('Probar') {
-            stepsf {
-                sh 'python -m pytest --juniual-reports/results.xml'
+            steps {
+                sh 'python3 -m pytest --junitxml=results.xml'
             }
         }
     }
-    post {
-        always {
-            junit 'reports/results.xml'
-        }
-    }
 }
+
 
 
