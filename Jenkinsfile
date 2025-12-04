@@ -1,13 +1,15 @@
 pipeline {
-    agent any
+    agent {
+        label 'python'
+    }
 
     stages {
         stage('Entorno') {
             steps {
                 sh 'python3 --version'
+                sh 'pip3 --version'
                 sh 'pip install pytest'
-                // Si realmente necesitas 'pigs', asegúrate que esté instalado
-                sh 'pigs --version || echo "pigs no está instalado"'
+                sh 'pip install pandas'
             }
         }
 
@@ -19,14 +21,19 @@ pipeline {
 
         stage('Ejecutar') {
             steps {
-                sh 'python3 hola.py'
                 sh 'python3 operaciones.py'
             }
         }
 
         stage('Probar') {
             steps {
-                sh 'python3 -m pytest --junitxml=results.xml'
+                sh 'pip install pandas'
+                sh 'python3 -m pytest --junitxml=reports/results.xml'
+            }
+            post {
+                always {
+                    junit 'reports/results.xml'
+                }
             }
         }
     }
